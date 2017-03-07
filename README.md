@@ -12,4 +12,4 @@ A python tool that will/should convert a sentence into structured data.
   - `pip3 install -U TextBlob`
   - `python3 -m textblob.download_corpora`
 - Run the app
-  - `python3 analyzer.py 'Menan was born in Sri Lanka'`
+  - `python3 analyzer.py '<sentence you want to analyze>'`
