@@ -42,7 +42,7 @@ def get_last_index_of(tag, all_tags):
 def get_verbs(tags):
     verbs = []
     for tag in tags:
-        if 'VB' in tag[1] or 'RP' in tag[1]:
+        if 'VB' in tag[1] or 'RP' in tag[1] and 'PRP' not in tag[1]:
             verbs.append(tag)
     return verbs
 
@@ -90,7 +90,7 @@ def adj_after_verb(verbs, all_tags):
         # return tags
         adjs = []
         for tag in tags:
-            if 'JJ' in tag[1]:
+            if 'JJ' in tag[1] or 'RB' in tag[1]:
                 adjs.append(tag)
         return adjs
 
