@@ -68,6 +68,19 @@ def noun_before_verbs(verbs, all_tags):
                 nouns.append(tag)
         return nouns
 
+def prep_after_verb(verb, all_tags):
+    if len(verbs) > 0:
+        verb = verbs[0]
+        index = converted_tags.index(verb)
+        tags = all_tags[index+1:]
+
+        preps = []
+        for tag in tags:
+            if 'IN' in tag[1]:
+                preps.append(tag)
+        return preps
+
+
 def noun_after_verb(verbs, all_tags):
     if len(verbs) > 0:
         verb = verbs[len(verbs) - 1]
@@ -128,6 +141,7 @@ converted_tags = compound(text)
 verbs = get_verbs(converted_tags)
 subjects = noun_before_verbs(verbs, converted_tags)
 objects = noun_after_verb(verbs, converted_tags)
+preposition = prep_after_verb(verbs, converted_tags)
 determiner = get_determiner(verbs, converted_tags)
 adj = adj_after_verb(verbs, converted_tags)
 
@@ -135,6 +149,7 @@ print('Tags: ', converted_tags)
 print('Subjects: ', subjects)
 print('Verb is: ', verbs)
 print('Which/how: ', adj)
+print('Preposition: ', preposition)
 print('Object: ', objects)
 print('Determiner: ', determiner)
 
