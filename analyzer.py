@@ -1,4 +1,6 @@
 from textblob import TextBlob
+from textblob.utils import tree2str, filter_insignificant
+import nltk
 import sys
 import time
 
@@ -40,6 +42,7 @@ def get_last_index_of(tag, all_tags):
     return
 
 def get_verbs(tags):
+    ''' Finds the verbs'''
     verbs = []
     for tag in tags:
         if 'VB' in tag[1] or 'RP' in tag[1] and 'PRP' not in tag[1]:
@@ -47,6 +50,7 @@ def get_verbs(tags):
     return verbs
 
 def get_determiner(verbs, all_tags):
+    ''' Finds the Determiner before the provided verb'''
     if len(verbs) > 0:
         verb = verbs[len(verbs) - 1]
         index = all_tags.index(verb)
@@ -57,6 +61,7 @@ def get_determiner(verbs, all_tags):
                 return tag
 
 def noun_before_verbs(verbs, all_tags):
+    ''' Finds the Noun before the provided verb'''
     if len(verbs) > 0:
         verb = verbs[0]
         index = converted_tags.index(verb)
@@ -69,6 +74,7 @@ def noun_before_verbs(verbs, all_tags):
         return nouns
 
 def prep_after_verb(verb, all_tags):
+    ''' Finds the Preposition after the provided verb'''
     if len(verbs) > 0:
         verb = verbs[0]
         index = converted_tags.index(verb)
@@ -82,6 +88,7 @@ def prep_after_verb(verb, all_tags):
 
 
 def noun_after_verb(verbs, all_tags):
+    ''' Finds the Noun after the provided verb'''
     if len(verbs) > 0:
         verb = verbs[len(verbs) - 1]
         index = all_tags.index(verb)
@@ -91,11 +98,12 @@ def noun_after_verb(verbs, all_tags):
         # return tags
         nouns = []
         for tag in tags:
-            if 'NN' in tag[1] or 'IN' in tag[1]:
+            if 'NN' in tag[1]: # or 'IN' in tag[1]:
                 nouns.append(tag)
         return nouns
 
 def adj_after_verb(verbs, all_tags):
+    ''' Finds the adjective after the provided verb'''
     if len(verbs) > 0:
         verb = verbs[len(verbs) - 1]
         index = all_tags.index(verb)
@@ -109,54 +117,63 @@ def adj_after_verb(verbs, all_tags):
 
 
 text = '''
-Menan Vadivel was born in Sri Lanka.
-'''
-text1 = '''
-Menan Vadivel's birth place is Sri Lanka.
-'''
-text2 = '''
-Herman Goring is a doctor
+The engineers at Apple train Machine Learning models on large, transcribed datasets in order to create efficient speech recognition models for Siri. These models are trained with highly diverse datasets that comprise of the voice samples of a large group of people. This way, Siri is able to cater to various accents.
 '''
 
-text3 = '''
-A tuple is a sequence of immutable Python objects.
-'''
+texts = [
+    "I'm sad.",
+    "Menan is eating.",
+    "Lions are beautiful.",
+    "Sri Lanka is racist.",
+    "Canada is cold.",
+]
 
-text4 = '''
-The girl is learning how to drive
-'''
+texts2 = [
+    "My brother and I went to the mall last night.",
+    "This new laptop computer has already crashed twice.",
+    "I cannot drink warm milk.",
+    "A day without sunshine is like night.",
+    "Only the mediocre are always at their best.",
+    "Reality continues to ruin my life.",
+]
+texts3 = [
+    "My brother and I went to the mall last night.",
+    "This new laptop computer has already crashed twice.",
+    "I cannot drink warm milk.",
+    "A day without sunshine is like night.",
+    "Only the mediocre are always at their best.",
+    "Reality continues to ruin my life.",
+]
+texts4 = [
+    "The engineers at Apple train Machine Learning models on large, transcribed datasets in order to create efficient speech recognition models for Siri. ",
+    "These models are trained with highly diverse datasets that comprise of the voice samples of a large group of people.",
+    "This way, Siri is able to cater to various accents.",
+]
 
-text5 = '''
-Hitler was arrested and tried for high treason
-'''
+for aText in texts4:
+    converted_tags = compound(aText)
+    verbs = get_verbs(converted_tags)
+    subjects = noun_before_verbs(verbs, converted_tags)
+    objects = noun_after_verb(verbs, converted_tags)
+    preposition = prep_after_verb(verbs, converted_tags)
+    determiner = get_determiner(verbs, converted_tags)
+    adj = adj_after_verb(verbs, converted_tags)
 
-text6 = '''
-Rob can use Bob on his farm.
-'''
+    print(aText)
+    print('-----------------------------------------')
+    print(converted_tags)
+    print('Verbs: \t\t\t', verbs)
+    print('Subjects:\t\t', subjects)
+    print('Objects:\t\t', objects)
+    print('What/Which/Who/How:\t', adj)
+    print('Preposition:\t\t', preposition)
+    print('===================xxxx==================')
+    # print('Determiner: ', determiner)
 
-if len(sys.argv) > 1:
-    text = sys.argv[1]
-
-converted_tags = compound(text)
-verbs = get_verbs(converted_tags)
-subjects = noun_before_verbs(verbs, converted_tags)
-objects = noun_after_verb(verbs, converted_tags)
-preposition = prep_after_verb(verbs, converted_tags)
-determiner = get_determiner(verbs, converted_tags)
-adj = adj_after_verb(verbs, converted_tags)
-
-print('Tags: ', converted_tags)
-print('Subjects: ', subjects)
-print('Verb is: ', verbs)
-print('Which/how: ', adj)
-print('Preposition: ', preposition)
-print('Object: ', objects)
-print('Determiner: ', determiner)
-
-millisecs = (time.time() - start_time) * 1000
-print("--- Took %s milliseconds to analyze ---" % millisecs)
-# steps to comprehension
-# 1 - get verbs
-# 2 - find noun from the verb
-# 3 - find the tense
-# 4 - analyze the period
+    # millisecs = (time.time() - start_time) * 1000
+    # print("--- Took %s milliseconds to analyze ---" % millisecs)
+    # steps to comprehension
+    # 1 - get verbs
+    # 2 - find noun from the verb
+    # 3 - find the tense
+    # 4 - analyze the period
